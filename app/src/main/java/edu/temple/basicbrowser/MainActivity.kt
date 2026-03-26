@@ -23,14 +23,25 @@ class MainActivity : AppCompatActivity() {
 
         webView.settings.javaScriptEnabled = true
 
-        webView.webViewClient = WebViewClient()
+        webView.webViewClient = object : WebViewClient() {
+            override fun onPageFinished(view: WebView?, url: String?) {
+                super.onPageFinished(view, url)
+                // Update the URL bar when a page finishes loading
+                urlEditText.setText(url)
+            }
+        }
 
         goButton.setOnClickListener {
-            var url = urlEditText.text.toString()
-            if (!url.startsWith("http://") && !url.startsWith("https://")) {
-                url = "http://$url"
-            }
-            webView.loadUrl(url)
+            val url = urlEditText.text.toString()
+            webView.loadUrl(fixUrl(url))
+        }
+    }
+
+    private fun fixUrl(url: String): String {
+        return if (url.startsWith("http://") || url.startsWith("https://")) {
+            url
+        } else {
+            "https://$url"
         }
     }
 }
